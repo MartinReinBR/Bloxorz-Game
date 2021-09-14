@@ -4,80 +4,59 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    int Coins = 0;
-    [SerializeField] float InputThreshold;
-    [SerializeField] float duration;
+    public float TurnSpeed = 300;
+    bool isRolling;
 
-    bool isRolling = false;
-    float scale;
+    public Renderer rend;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Update()
     {
-        scale = transform.localScale.x / 2;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Coins += 1;
-        Debug.Log("Amount of coins: " + Coins);
-        Destroy(other.gameObject);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        float x = Input.GetAxis("Horizontal");
-        float y = Input.GetAxis("Vertical");
-
-        if (!isRolling && ((x > InputThreshold || x < -InputThreshold) || (y > InputThreshold || y < -InputThreshold)))
+        if (Input.GetKeyDown(KeyCode.W) && !isRolling)
         {
             isRolling = true;
-            StartCoroutine(RollingCube(x, y));
+            StartCoroutine(RollCube(Vector3.forward, rend.bounds.max.z));
+        }
+        else if (Input.GetKeyDown(KeyCode.S) && !isRolling)
+        {
+            isRolling = true;
+            StartCoroutine(RollCube(Vector3.back, rend.bounds.min.z));
+        }
+        if (Input.GetKeyDown(KeyCode.D) && !isRolling)
+        {
+            isRolling = true;
+            StartCoroutine(RollCube(Vector3.right, rend.bounds.max.x));
+        }
+        else if (Input.GetKeyDown(KeyCode.A) && !isRolling)
+        {
+            isRolling = true;
+            StartCoroutine(RollCube(Vector3.left, rend.bounds.min.x));
         }
     }
 
-    IEnumerator RollingCube(float x, float y)
+    IEnumerator RollCube(Vector3 direction, float dir)
     {
-        float elapsed = 0.0f;
-        Vector3 point = Vector3.zero;
-        Vector3 axis = Vector3.zero;
-        float angle = 0.0f;
-        Vector3 direction = Vector3.zero;
-
-        if(x != 0)
+        float remainingAngle = 90;
+        Vector3 rotationCenter = rend.bounds.center;
+        if(direction.x != 0)
         {
-            axis = Vector3.forward;
-            point = x > 0 ? transform.position + (Vector3.right * scale) :
-            transform.position + (Vector3.left * scale);
-            angle = x > 0 ? -90 : 90;
-            direction = x > 0 ? Vector3.right : Vector3.left;
+            Debug.Log("X");
+            rotationCenter = new Vector3(dir, rend.bounds.min.y, 0);
         }
-
-        else if(y != 0)
+        else if(direction.z != 0)
         {
-            axis = Vector3.right;
-            point = y > 0 ? transform.position + (Vector3.forward * scale) :
-            transform.position + (Vector3.back * scale);
-            angle = y > 0 ? 90 : -90;
-            direction = y > 0 ? Vector3.forward : Vector3.back;
+            Debug.Log("Y");
+            rotationCenter = new Vector3(0, rend.bounds.min.y, dir);
         }
+        
+        Vector3 rotationAxis = Vector3.Cross(Vector3.up, direction);
 
-        point += new Vector3(0, -scale, 0);
-        Vector3 adjustPos = point + direction * scale - new Vector3(0, -0.5f, 0);
-        Quaternion adjustRotation = Quaternion.Euler(direction * 90f);
-
-        while(elapsed < duration)
+        while (remainingAngle > 0)
         {
-            elapsed += Time.deltaTime;
-
-            transform.RotateAround(point, axis, angle / duration * Time.deltaTime);
-
+            float rotationAngle = Mathf.Min(Time.deltaTime * TurnSpeed, remainingAngle);
+            transform.RotateAround(rotationCenter, rotationAxis, rotationAngle);
+            remainingAngle -= rotationAngle;
             yield return null;
         }
-
-        transform.position = adjustPos;
-        transform.rotation = adjustRotation;
         isRolling = false;
     }
 
