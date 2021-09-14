@@ -4,10 +4,21 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public float points = 0;
+
     public float TurnSpeed = 300;
     bool isRolling;
 
     public Renderer rend;
+
+    public void AddPoints()
+    {
+        points++;
+        if (points >= 10)
+        {
+            Debug.Log("All Coins, GO next life bussy");
+        }
+    }
 
     private void Update()
     {
@@ -59,6 +70,5 @@ public class Player : MonoBehaviour
         }
         isRolling = false;
     }
-
 
 }
