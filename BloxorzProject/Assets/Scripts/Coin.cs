@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class Coin : MonoBehaviour
 {
-    public float rotateSpeed;
+    [SerializeField] private float rotateSpeed;
 
-    // Update is called once per frame
     void Update()
     {
         transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);

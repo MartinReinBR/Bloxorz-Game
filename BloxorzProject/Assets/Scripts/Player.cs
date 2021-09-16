@@ -4,21 +4,13 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float points = 0;
+    public int points = 0;
 
-    public float TurnSpeed = 300;
-    bool isRolling;
+    [SerializeField] private  float TurnSpeed = 300;
+    private bool isRolling;
 
-    public Renderer rend;
-
-    public void AddPoints()
-    {
-        points++;
-        if (points >= 10)
-        {
-            Debug.Log("All Coins, GO next life bussy");
-        }
-    }
+    [SerializeField] private Renderer rend;
+    [SerializeField] private UI ui;
 
     private void Update()
     {
@@ -48,14 +40,14 @@ public class Player : MonoBehaviour
     {
         float remainingAngle = 90;
         Vector3 rotationCenter = rend.bounds.center;
+
         if(direction.x != 0)
         {
-            Debug.Log("X");
             rotationCenter = new Vector3(dir, rend.bounds.min.y, 0);
         }
+
         else if(direction.z != 0)
         {
-            Debug.Log("Y");
             rotationCenter = new Vector3(0, rend.bounds.min.y, dir);
         }
         
@@ -68,7 +60,14 @@ public class Player : MonoBehaviour
             remainingAngle -= rotationAngle;
             yield return null;
         }
+
         isRolling = false;
+    }
+
+    public void AddPoints()
+    {
+        points++;
+        ui.SetPointsText(points);
     }
 
 }
