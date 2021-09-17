@@ -1,3 +1,3 @@
-# Test-Game
+# Bloxorz Game
 Testin stuff
 Yo
